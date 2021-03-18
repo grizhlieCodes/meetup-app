@@ -56,25 +56,48 @@
     };
 
     if (id) {
-      meetups.updateMeetup(id, meetupData);
+      fetch(
+        `https://svelte-meetups-302c3-default-rtdb.europe-west1.firebasedatabase.app/meetups/${id}.json`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(meetupData),
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+        .then((res) => {
+          if(!res.ok){
+            throw new Error('Error, EditMeetup')
+          }
+          meetups.updateMeetup(id, meetupData);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } else {
-      fetch("https://svelte-meetups-302c3-default-rtdb.europe-west1.firebasedatabase.app/meetups.json", {
-        method: "POST",
-        body: JSON.stringify({...meetupData, isFavorite: false}),
-        headers: {'Content-Type': 'application/json'}
-      }).then(res => {
-        if(!res.ok){
-          throw new Error('Failed!')
-        } 
-        return res.json()
-      })
-      .then(data => {
-        meetups.addMeetup({...meetupData, isFavorite: false, id: data.name});
-      })
-      .catch(err => {
-        console.log(err)
-      })
-      
+      fetch(
+        "https://svelte-meetups-302c3-default-rtdb.europe-west1.firebasedatabase.app/meetups.json",
+        {
+          method: "POST",
+          body: JSON.stringify({ ...meetupData, isFavorite: false }),
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed!");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          meetups.addMeetup({
+            ...meetupData,
+            isFavorite: false,
+            id: data.name,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
 
     dispatch("save");
@@ -84,9 +107,9 @@
     dispatch("cancel");
   }
 
-  function deleteMeetup(){
-    meetups.removeMeetup(id)
-    dispatch("save")
+  function deleteMeetup() {
+    meetups.removeMeetup(id);
+    dispatch("save");
   }
 </script>
 
@@ -151,7 +174,7 @@
   <div slot="footer">
     <Button type="Button" on:click={cancel}>Cancel</Button>
     <Button type="Button" on:click={submitForm} disabled={!formIsValid}>
-      {id ? 'Edit Meetup' : 'Add Meetup'}
+      {id ? "Edit Meetup" : "Add Meetup"}
     </Button>
     {#if id}
       <Button type="button" on:click={deleteMeetup}>Delete</Button>

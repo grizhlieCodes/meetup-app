@@ -17,8 +17,6 @@
 
   function setFilter(event){
     favsOnly = event.detail === 1;
-
-
   }
 </script>
 
@@ -28,8 +26,11 @@
 
   <Button on:click={() => dispatch('add-meetup') }>Add Meetup</Button>
 </section>
-<section id="meetups">
 
+{#if filteredMeetups.length === 0}
+  <p id="no-meetups">No meetups found, you can start by adding some!</p>
+{:else}
+<section id="meetups">
   {#each filteredMeetups as meetup (meetup.id)}
   <div transition:scale animate:flip={{duration:200}} >
     <MeetupItem
@@ -47,8 +48,13 @@
   </div>
   {/each}
 </section>
+{/if}
 
 <style>
+
+  #no-meetups {
+    margin: 1rem;
+  }
   #meetups {
     margin-top: 5rem;
   }

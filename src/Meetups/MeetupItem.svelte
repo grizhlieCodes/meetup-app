@@ -16,7 +16,16 @@
   export let isFav;
 
   function toggleFavorite() {
-    meetups.toggleFavorite(id);
+    fetch(`https://svelte-meetups-302c3-default-rtdb.europe-west1.firebasedatabase.app/meetups/${id}.json`,{
+      method: "PATCH",
+      body: JSON.stringify({isFavorite: !isFav}),
+      headers: { "Content-Type": "application/json" },
+    }).then(res => {
+      if(!res.ok){
+        throw new Error('I am error')
+      }
+      meetups.toggleFavorite(id);
+    }).catch(err => (console.log(err)))
   }
 </script>
 

@@ -5,29 +5,35 @@
   import Button from "./UI/Button.svelte";
   import meetups from "./Meetups/meetup-store.js";
   import MeetupDetail from "./Meetups/MeetupDetail.svelte";
+  import LoadingSpinner from './UI/LoadingSnipper.svelte';
 
   let editMode = false;
   let editedId;
   let page = "overview";
   let pageData = {};
+  let isLoading = true;
 
   fetch(
-    "https://svelte-meetups-302c3-default-rtdb.europe-west1.firebasedatabase.app/meetups.json")
-    .then(res => {
-      if(!res.ok){
-        throw new Error('Failed fetching! try again laterz.')
+    "https://svelte-meetups-302c3-default-rtdb.europe-west1.firebasedatabase.app/meetups.json"
+  )
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Failed fetching! try again laterz.");
       }
-      return res.json()
+      return res.json();
     })
-    .then(data => {
-      const loadedMeetups = []
-      for (const key in data){
+    .then((data) => {
+      const loadedMeetups = [];
+      for (const key in data) {
         loadedMeetups.push({
           ...data[key],
-          id: key
-        })
+          id: key,
+        });
       }
-      meetups.setMeetups(loadedMeetups)
+      setTimeout(() => {
+        isLoading = false;
+        meetups.setMeetups(loadedMeetups);
+      }, 1000);
     })
     .catch((err) => console.log(err));
 
@@ -58,6 +64,8 @@
   {#if page === "overview"}
     {#if editMode}
       <EditMeetup id={editedId} on:save={savedMeetup} on:cancel={cancelEdit} />
+    {:else if isLoading}
+      <LoadingSpinner />
     {:else}
       <MeetupGrid
         meetups={$meetups}
